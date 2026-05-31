@@ -1,0 +1,42 @@
+# ── Python ────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# ── Environment variables (NEVER commit these!) ──
+.env
+.env.local
+.env.production
+*.env
+
+# ── Node.js / Next.js ────────────────────
+node_modules/
+.next/
+out/
+.npm
+npm-debug.log*
+
+# ── Database ─────────────────────────────
+*.db
+*.sqlite
+
+# ── OS Files ─────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── IDE ──────────────────────────────────
+.vscode/settings.json
+.idea/
+
+# ── Uploads ──────────────────────────────
+uploads/
+media/
