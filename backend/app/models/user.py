@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum
 from sqlalchemy.sql import func
 from app.database import Base
 import enum
-
+from sqlalchemy.orm import relationship
 
 class UserRole(str, enum.Enum):
     CUSTOMER = 'customer'
@@ -33,3 +33,10 @@ class User(Base):
     # Timestamps (set automatically)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    vehicles      = relationship('Vehicle',      back_populates='owner')
+    bookings      = relationship('Booking',      back_populates='customer')
+    reviews       = relationship('Review',       back_populates='customer')
+    documents     = relationship('UserDocument', back_populates='user',
+                                 foreign_keys='UserDocument.user_id')
+    notifications = relationship('Notification', back_populates='user')

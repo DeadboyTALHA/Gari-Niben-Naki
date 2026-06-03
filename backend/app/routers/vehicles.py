@@ -1,3 +1,4 @@
+from backend.app.models.booking import Booking
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
@@ -123,3 +124,25 @@ def delete_vehicle(
         raise HTTPException(status_code=404, detail='Not found')
     db.delete(v)
     db.commit()
+
+@router.get('/my')
+def my_vehicles(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_owner),
+):
+    '''Returns all vehicles owned by the currently logged-in owner.'''
+    return db.query(Vehicle).filter(Vehicle.owner_id == current_user.id).all()
+
+@router.get('/{booking_id}')
+def get_booking(
+    booking_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    booking = db.query(Booking).filter(Booking.id == booking_id).first()
+    if not booking:
+        raise HTTPException(status_code=404, detail='Booking not found')
+    # Only the customer or an admin can view
+    if booking.customer_id != current_user.id and current_user.role != 'admin':
+        raise HTTPException(status_code=403, detail='Access denied')
+    return booking

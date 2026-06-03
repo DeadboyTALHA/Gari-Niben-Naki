@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import Base, engine
-from app.routers import auth, users, vehicles, bookings, payments, admin
+from app.routers import auth, users, vehicles, bookings, payments, admin, reviews, documents, disputes
 from app.config import settings
-
 
 # Create all database tables (only creates if not exists)
 Base.metadata.create_all(bind=engine)
@@ -32,6 +31,9 @@ app.include_router(vehicles.router, prefix='/api/vehicles', tags=['Vehicles'])
 app.include_router(bookings.router, prefix='/api/bookings', tags=['Bookings'])
 app.include_router(payments.router, prefix='/api/payments', tags=['Payments'])
 app.include_router(admin.router, prefix='/api/admin', tags=['Admin'])
+app.include_router(reviews.router, prefix='/api/reviews', tags=['Reviews'])
+app.include_router(documents.router, prefix='/api/documents', tags=['Documents'])
+app.include_router(disputes.router, prefix='/api/disputes', tags=['Disputes'])
 
 
 @app.get('/')
