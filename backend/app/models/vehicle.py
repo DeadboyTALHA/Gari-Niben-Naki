@@ -71,3 +71,7 @@ class Vehicle(Base):
     owner = relationship('User', back_populates='vehicles')
     bookings = relationship('Booking', back_populates='vehicle')
     reviews = relationship('Review', back_populates='vehicle')
+
+    images = relationship('VehicleImage', back_populates='vehicle',
+                          cascade='all, delete-orphan',
+                          order_by='VehicleImage.order')

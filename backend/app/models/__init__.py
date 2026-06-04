@@ -7,10 +7,12 @@ from app.models.review       import Review
 from app.models.document     import UserDocument, DocumentType, DocumentStatus
 from app.models.dispute      import Dispute, DisputeStatus
 from app.models.notification import Notification, NotificationType
+from app.models.vehicle_image import VehicleImage
 
 __all__ = [
     'User', 'UserRole',
     'Vehicle', 'VehicleStatus', 'FuelType', 'TransmissionType',
+    'VehicleImage'
     'Booking', 'BookingStatus', 'InsuranceTier',
     'Payment', 'PaymentStatus', 'PaymentMethod',
     'Review',

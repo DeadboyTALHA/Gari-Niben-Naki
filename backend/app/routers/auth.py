@@ -8,6 +8,7 @@ from app.database import get_db
 from app.models.user import User, UserRole
 from app.config import settings
 from pydantic import BaseModel, EmailStr
+from app.utils.dependencies import get_current_user
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -90,7 +91,19 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
 
 
 @router.get('/me')
-def get_me(db: Session = Depends(get_db), token: str = Depends(lambda x: x)):
-    # Returns the current logged-in user's profile
-    # See ddependencies.py for get_current_user
-    pass
+def get_me(current_user: User = Depends(get_current_user)):
+    '''
+    Returns the profile of the currently logged-in user.
+    Called by the frontend after login to get the full user object.
+    '''
+    return {
+        'id':              current_user.id,
+        'full_name':       current_user.full_name,
+        'email':           current_user.email,
+        'phone':           current_user.phone,
+        'role':            current_user.role,
+        'is_verified':     current_user.is_verified,
+        'is_kyc_approved': current_user.is_kyc_approved,
+        'profile_picture': current_user.profile_picture,
+        'created_at':      current_user.created_at,
+    }
