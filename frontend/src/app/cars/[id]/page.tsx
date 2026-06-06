@@ -5,6 +5,7 @@ import { useVehicle } from '@/hooks/useVehicles';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import BookingWidget from '@/components/booking/BookingWidget';
 import ReviewsList from '@/components/cars/ReviewsList';
+import Image from 'next/image';
 
 export default function CarDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);  // Next.js 15: params is a Promise
@@ -22,11 +23,47 @@ export default function CarDetailPage({ params }: { params: Promise<{ id: string
         {/* ── Left column (2/3 width) ─────────────────────── */}
         <div className='lg:col-span-2 space-y-6'>
 
-          {/* Image placeholder */}
-          <div className='h-72 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl
-                         flex items-center justify-center text-8xl'>
-            🚗
-          </div>
+          {vehicle.images && vehicle.images.length > 0 ? (
+            <div className='space-y-2'>
+              {/* Main large image */}
+              <div className='relative h-72 rounded-2xl overflow-hidden bg-gray-100'>
+                <Image
+                  src={
+                    (vehicle.images.find(img => img.is_primary) ?? vehicle.images[0]).image_url
+                  }
+                  alt={`${vehicle.brand} ${vehicle.model}`}
+                  fill
+                  className='object-cover'
+                  priority  // Load the main image first for performance
+                  sizes='(max-width: 1024px) 100vw, 66vw'
+                />
+              </div>
+
+              {/* Thumbnail row — show up to 4 extra photos */}
+              {vehicle.images.length > 1 && (
+                <div className='grid grid-cols-4 gap-2'>
+                  {vehicle.images.slice(0, 4).map(img => (
+                    <div key={img.id}
+                        className='relative h-20 rounded-xl overflow-hidden bg-gray-100'>
+                      <Image
+                        src={img.image_url}
+                        alt='Car photo'
+                        fill
+                        className='object-cover hover:opacity-90 transition cursor-pointer'
+                        sizes='25vw'
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            // Fallback if no photos uploaded
+            <div className='h-72 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl
+                          flex items-center justify-center text-8xl'>
+              🚗
+            </div>
+          )}
 
           {/* Title + rating */}
           <div>

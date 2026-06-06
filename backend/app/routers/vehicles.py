@@ -1,6 +1,6 @@
 from backend.app.models.booking import Booking
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_, or_
 from typing import Optional, List
 from app.database import get_db
@@ -42,7 +42,9 @@ def list_vehicles(
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=50),
 ):
-    query = db.query(Vehicle).filter(Vehicle.status == VehicleStatus.ACTIVE)
+    query = db.query(Vehicle).options(
+        joinedload(Vehicle.images)
+    ).filter(Vehicle.status == VehicleStatus.ACTIVE)
 
     if city:
         query = query.filter(Vehicle.location_city.ilike(f'%{city}%'))
@@ -71,7 +73,9 @@ def list_vehicles(
 
 @router.get('/{vehicle_id}')
 def get_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
-    v = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
+    v = db.query(Vehicle).options(
+        joinedload(Vehicle.images)
+    ).filter(Vehicle.id == vehicle_id).first()
     if not v:
         raise HTTPException(status_code=404, detail='Vehicle not found')
     return v
