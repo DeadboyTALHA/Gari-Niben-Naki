@@ -41,6 +41,12 @@ export default function Navbar() {
                 <Link href={dashboardLink()} className='text-gray-600 hover:text-blue-700'>
                   <User className='inline h-4 w-4 mr-1' />Dashboard
                 </Link>
+                {isAuthenticated && (user?.role === 'owner' || user?.role === 'both') && (
+                  <Link href='/owner/bookings'
+                    className='text-gray-600 hover:text-blue-700 transition text-sm'>
+                    Bookings
+                  </Link>
+                )}
                 <button onClick={handleLogout} className='text-gray-600 hover:text-red-600 flex items-center gap-1'>
                   <LogOut className='h-4 w-4' /> Logout
                 </button>

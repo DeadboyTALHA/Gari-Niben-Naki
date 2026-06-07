@@ -7,7 +7,7 @@ from app.database import get_db
 from app.models.booking import Booking, BookingStatus, InsuranceTier
 from app.models.vehicle import Vehicle, VehicleStatus
 from app.models.user import User
-from app.utils.dependencies import get_current_user
+from app.utils.dependencies import get_current_user, require_owner
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -112,3 +112,47 @@ def cancel_booking(
     booking.status = BookingStatus.CANCELLED
     db.commit()
     return {'message': 'Booking cancelled successfully'}
+
+@router.get('/owner')
+def owner_bookings(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_owner),
+    status: Optional[str] = None,
+    page: int = 1,
+    page_size: int = 20,
+):
+    '''
+    Returns all bookings for vehicles that belong to the logged-in owner.
+    Owners use this to see upcoming pickups and manage rentals.
+    '''
+    # Get IDs of all vehicles owned by this user
+    vehicle_ids = [
+        v.id for v in db.query(Vehicle.id).filter(
+            Vehicle.owner_id == current_user.id
+        ).all()
+    ]
+
+    if not vehicle_ids:
+        return {'total': 0, 'bookings': [], 'page': page}
+
+    # Query bookings for those vehicles
+    query = db.query(Booking).filter(Booking.vehicle_id.in_(vehicle_ids))
+
+    # Optional status filter
+    if status:
+        query = query.filter(Booking.status == status)
+
+    total    = query.count()
+    bookings = (
+        query
+        .order_by(Booking.pickup_date.asc())  # soonest pickup first
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+
+    return {
+        'total':    total,
+        'page':     page,
+        'bookings': bookings,
+    }

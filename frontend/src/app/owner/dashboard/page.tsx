@@ -6,7 +6,7 @@ import { Vehicle } from '@/types';
 import StatsCard from '@/components/dashboard/StatsCard';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { Car, PlusCircle, DollarSign, Star } from 'lucide-react';
+import { Car, PlusCircle, DollarSign, Star, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
 
@@ -32,16 +32,23 @@ export default function OwnerDashboard() {
 
   return (
     <div className='max-w-6xl mx-auto px-4 py-8'>
-      <div className='flex items-center justify-between mb-8'>
+      <div className='flex items-center justify-between mb-8 flex-wrap gap-4'>
         <div>
           <h1 className='text-3xl font-bold text-gray-900'>Owner Dashboard</h1>
           <p className='text-gray-500 mt-1'>Manage your car listings</p>
         </div>
-        <Link href='/owner/cars/new'
-          className='flex items-center gap-2 bg-blue-700 text-white px-5 py-2.5
-                     rounded-xl hover:bg-blue-800 transition font-medium'>
-          <PlusCircle className='h-5 w-5' /> Add New Car
-        </Link>
+        <div className='flex gap-3'>
+          <Link href='/owner/bookings'
+            className='flex items-center gap-2 border border-blue-700 text-blue-700
+                      px-5 py-2.5 rounded-xl hover:bg-blue-50 transition font-medium'>
+            <BookOpen className='h-5 w-5' /> View Bookings
+          </Link>
+          <Link href='/owner/cars/new'
+            className='flex items-center gap-2 bg-blue-700 text-white px-5 py-2.5
+                      rounded-xl hover:bg-blue-800 transition font-medium'>
+            <PlusCircle className='h-5 w-5' /> Add New Car
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
