@@ -5,6 +5,7 @@ from app.models.vehicle import Vehicle, VehicleStatus
 from app.models.user import User
 from app.utils.dependencies import require_admin
 from pydantic import BaseModel
+from app.services.notification_service import notify_car_approved, notify_car_rejected
 
 router = APIRouter()
 
@@ -34,6 +35,7 @@ def approve_vehicle(
         raise HTTPException(status_code=404, detail='Vehicle not found')
     v.status = VehicleStatus.ACTIVE
     db.commit()
+    notify_car_approved(db, v.owner_id, f'{v.brand} {v.model} {v.year}')
     return {'message': 'Vehicle approved'}
 
 
@@ -49,6 +51,8 @@ def reject_vehicle(
         raise HTTPException(status_code=404, detail='Vehicle not found')
     v.status = VehicleStatus.REJECTED
     db.commit()
+    notify_car_rejected(db, v.owner_id,
+                        f'{v.brand} {v.model} {v.year}', reason)
     return {'message': f'Vehicle rejected: {reason}'}
 
 

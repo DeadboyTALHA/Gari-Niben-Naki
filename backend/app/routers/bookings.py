@@ -9,6 +9,9 @@ from app.models.vehicle import Vehicle, VehicleStatus
 from app.models.user import User
 from app.utils.dependencies import get_current_user, require_owner
 from pydantic import BaseModel
+from app.services.notification_service import (
+    notify_booking_confirmed,
+)
 
 router = APIRouter()
 
@@ -79,6 +82,8 @@ def create_booking(
     db.add(booking)
     db.commit()
     db.refresh(booking)
+    # Notify the customer their booking was created
+    notify_booking_confirmed(db, current_user.id, booking.booking_ref)
     return booking
 
 

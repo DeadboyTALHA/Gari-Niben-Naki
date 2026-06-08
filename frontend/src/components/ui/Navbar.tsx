@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore';
 import { Car, Menu, X, User, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import NotificationDropdown from '@/components/ui/NotificationDropdown';
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -74,8 +75,17 @@ export default function Navbar() {
           <Link href='/cars' className='text-gray-700 py-2' onClick={() => setMenuOpen(false)}>Browse Cars</Link>
           {isAuthenticated ? (
             <>
-              <Link href={dashboardLink()} className='text-gray-700 py-2' onClick={() => setMenuOpen(false)}>Dashboard</Link>
-              <button onClick={() => { handleLogout(); setMenuOpen(false); }} className='text-red-600 py-2 text-left'>Logout</button>
+              <Link href={dashboardLink()} className='text-gray-600 hover:text-blue-700'>
+                <User className='inline h-4 w-4 mr-1' />Dashboard
+              </Link>
+
+              {/* ── Notification bell (NEW) ── */}
+              <NotificationDropdown />
+
+              <button onClick={handleLogout}
+                className='text-gray-600 hover:text-red-600 flex items-center gap-1'>
+                <LogOut className='h-4 w-4' /> Logout
+              </button>
             </>
           ) : (
             <>
