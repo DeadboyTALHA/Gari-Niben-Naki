@@ -1,34 +1,123 @@
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Car, Shield, Star, ArrowRight, MapPin, Clock } from 'lucide-react';
+import { Car, Shield, Star, ArrowRight, Clock, Search, MapPin, Calendar } from 'lucide-react';
+
+// ── SearchForm component ──────────────────────────────────
+function SearchForm() {
+  const router = useRouter();
+  const [city,       setCity]       = useState('');
+  const [pickupDate, setPickupDate] = useState('');
+  const [returnDate, setReturnDate] = useState('');
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Build query params — only include non-empty values
+    const params = new URLSearchParams();
+    if (city.trim())  params.set('city',   city.trim());
+    if (pickupDate)   params.set('pickup', pickupDate);
+    if (returnDate)   params.set('return', returnDate);
+
+    // Navigate to /cars with the search params
+    router.push(`/cars?${params.toString()}`);
+  };
+
+  return (
+    <form
+      onSubmit={handleSearch}
+      className='bg-white rounded-2xl shadow-2xl p-2 flex flex-col sm:flex-row gap-2
+                 max-w-3xl mx-auto'
+    >
+      {/* City field */}
+      <div className='flex items-center gap-2 flex-1 px-4 py-2 rounded-xl
+                     bg-gray-50 border border-gray-200'>
+        <MapPin className='h-4 w-4 text-gray-400 flex-shrink-0' />
+        <input
+          type='text'
+          value={city}
+          onChange={e => setCity(e.target.value)}
+          placeholder='City (e.g. Dhaka)'
+          className='bg-transparent text-gray-800 text-sm w-full
+                     placeholder-gray-400 focus:outline-none'
+        />
+      </div>
+
+      {/* Pickup date */}
+      <div className='flex items-center gap-2 flex-1 px-4 py-2 rounded-xl
+                     bg-gray-50 border border-gray-200'>
+        <Calendar className='h-4 w-4 text-gray-400 flex-shrink-0' />
+        <input
+          type='date'
+          value={pickupDate}
+          min={today}
+          onChange={e => setPickupDate(e.target.value)}
+          className='bg-transparent text-gray-800 text-sm w-full
+                     focus:outline-none cursor-pointer'
+        />
+      </div>
+
+      {/* Return date */}
+      <div className='flex items-center gap-2 flex-1 px-4 py-2 rounded-xl
+                     bg-gray-50 border border-gray-200'>
+        <Calendar className='h-4 w-4 text-gray-400 flex-shrink-0' />
+        <input
+          type='date'
+          value={returnDate}
+          min={pickupDate || today}
+          onChange={e => setReturnDate(e.target.value)}
+          className='bg-transparent text-gray-800 text-sm w-full
+                     focus:outline-none cursor-pointer'
+        />
+      </div>
+
+      {/* Search button */}
+      <button
+        type='submit'
+        className='bg-blue-700 hover:bg-blue-800 text-white font-semibold
+                   px-6 py-3 rounded-xl transition flex items-center gap-2
+                   justify-center whitespace-nowrap'
+      >
+        <Search className='h-4 w-4' />
+        Search
+      </button>
+    </form>
+  );
+}
 
 export default function HomePage() {
   return (
     <div>
 
       {/* ── Hero ──────────────────────────────────────────── */}
-      <section className='bg-gradient-to-br from-blue-700 via-blue-800 to-blue-900 text-white py-24 px-4'>
+      <section className='bg-gradient-to-br from-blue-700 via-blue-800 to-blue-900
+                   text-white py-24 px-4'>
         <div className='max-w-4xl mx-auto text-center'>
           <h1 className='text-4xl md:text-6xl font-bold mb-4 leading-tight'>
             Find Your Perfect Ride
           </h1>
-          <p className='text-xl text-blue-100 mb-8 max-w-2xl mx-auto'>
+          <p className='text-xl text-blue-100 mb-10 max-w-2xl mx-auto'>
             Rent cars from trusted owners near you.
             Simple, affordable, and hassle-free.
           </p>
-          <div className='flex flex-col sm:flex-row gap-4 justify-center'>
+
+          {/* ── Search form ──────────────────────────────── */}
+          <SearchForm />
+
+          {/* ── Secondary CTA ────────────────────────────── */}
+          <p className='mt-6 text-blue-200 text-sm'>
+            Or{' '}
             <Link href='/cars'
-              className='bg-white text-blue-700 font-bold px-8 py-4 rounded-xl
-                         hover:bg-blue-50 transition inline-flex items-center gap-2'>
-              Browse Cars <ArrowRight className='h-5 w-5' />
+              className='text-white underline underline-offset-2 hover:text-blue-100'>
+              browse all available cars
             </Link>
-            <Link href='/register'
-              className='border-2 border-white text-white font-bold px-8 py-4 rounded-xl
-                         hover:bg-white/10 transition'>
-              List Your Car
-            </Link>
-          </div>
+          </p>
         </div>
       </section>
+
 
       {/* ── How It Works ───────────────────────────────────── */}
       <section id='how-it-works' className='py-20 px-4 bg-gray-50'>

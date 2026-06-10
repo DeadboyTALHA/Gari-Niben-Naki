@@ -1,14 +1,32 @@
 'use client';
-import { useState } from 'react';
-import { VehicleFilters } from '@/types';
-import Button from '@/components/ui/Button';
+import { useState, useEffect } from 'react';
+
+interface VehicleFilters {
+  city?: string;
+  fuel_type?: string;
+  transmission?: string;
+  max_price?: number;
+  seats?: number;
+  page?: number;
+}
 
 interface FiltersProps {
+  initialCity?: string;
   onFilterChange: (filters: VehicleFilters) => void;
 }
 
-export default function CarFilters({ onFilterChange }: FiltersProps) {
-  const [filters, setFilters] = useState<VehicleFilters>({});
+export default function CarFilters({ initialCity = '', onFilterChange }: FiltersProps) {
+  const [filters, setFilters] = useState<VehicleFilters>({
+    city: initialCity || undefined,
+  });
+
+  // Update city when URL param changes (from home page search)
+  useEffect(() => {
+    if (initialCity) {
+      setFilters(prev => ({ ...prev, city: initialCity }));
+      onFilterChange({ ...filters, city: initialCity, page: 1 });
+    }
+  }, [initialCity]);
 
   const update = (key: keyof VehicleFilters, value: any) => {
     const next = { ...filters, [key]: value || undefined, page: 1 };
@@ -16,7 +34,10 @@ export default function CarFilters({ onFilterChange }: FiltersProps) {
     onFilterChange(next);
   };
 
-  const reset = () => { setFilters({}); onFilterChange({}); };
+  const reset = () => { 
+    setFilters({}); 
+    onFilterChange({}); 
+  };
 
   return (
     <div className='bg-white rounded-xl shadow-sm p-5 space-y-5 sticky top-20'>
@@ -46,7 +67,10 @@ export default function CarFilters({ onFilterChange }: FiltersProps) {
         <div className='space-y-1'>
           {['petrol','diesel','electric','hybrid'].map(fuel => (
             <label key={fuel} className='flex items-center gap-2 cursor-pointer'>
-              <input type='radio' name='fuel' value={fuel}
+              <input 
+                type='radio' 
+                name='fuel' 
+                value={fuel}
                 checked={filters.fuel_type === fuel}
                 onChange={e => update('fuel_type', e.target.value as any)}
                 className='text-blue-700'
@@ -63,7 +87,10 @@ export default function CarFilters({ onFilterChange }: FiltersProps) {
         <div className='space-y-1'>
           {['manual','automatic'].map(t => (
             <label key={t} className='flex items-center gap-2 cursor-pointer'>
-              <input type='radio' name='transmission' value={t}
+              <input 
+                type='radio' 
+                name='transmission' 
+                value={t}
                 checked={filters.transmission === t}
                 onChange={e => update('transmission', e.target.value as any)}
                 className='text-blue-700'
@@ -79,7 +106,11 @@ export default function CarFilters({ onFilterChange }: FiltersProps) {
         <label className='block text-sm font-medium text-gray-700 mb-2'>
           Daily Rate (max: ${filters.max_price ?? '∞'})
         </label>
-        <input type='range' min={0} max={500} step={10}
+        <input 
+          type='range' 
+          min={0} 
+          max={500} 
+          step={10}
           value={filters.max_price ?? 500}
           onChange={e => update('max_price', Number(e.target.value))}
           className='w-full accent-blue-700'
